@@ -10,10 +10,17 @@ public class CharacterWordReducer extends Reducer<Text, IntWritable, Text, IntWr
 
     @Override
     public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-        int sum = 0;
+        int totalCount = 0;
+
+        // Sum occurrences of each word
         for (IntWritable val : values) {
-            sum += val.get();
+            totalCount += val.get();
         }
-        context.write(key, new IntWritable(sum));
+
+        // Emit the final output (Word, Frequency)
+        context.write(key, new IntWritable(totalCount));
+
+        // Increment counter for total unique words identified
+        context.getCounter("CustomCounters", "Total Unique Words Identified").increment(1);
     }
 }

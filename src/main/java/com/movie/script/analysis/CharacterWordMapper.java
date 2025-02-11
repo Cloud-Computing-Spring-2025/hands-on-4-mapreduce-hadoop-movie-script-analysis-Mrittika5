@@ -10,7 +10,7 @@ import java.util.StringTokenizer;
 public class CharacterWordMapper extends Mapper<Object, Text, Text, IntWritable> {
 
     private final static IntWritable one = new IntWritable(1);
-    private Text characterWord = new Text();
+    private Text word = new Text();
 
     @Override
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
@@ -27,18 +27,17 @@ public class CharacterWordMapper extends Mapper<Object, Text, Text, IntWritable>
             return; // Ignore malformed lines
         }
 
-        String character = line.substring(0, colonIndex).trim();
         String dialogue = line.substring(colonIndex + 1).trim();
 
         // Tokenize the dialogue
         StringTokenizer tokenizer = new StringTokenizer(dialogue, " .,!?\"'();:-");
 
         while (tokenizer.hasMoreTokens()) {
-            String word = tokenizer.nextToken().toLowerCase(); // Normalize to lowercase
-            characterWord.set(character + ":" + word);
-            context.write(characterWord, one);
-            
-            // Increment counters
+            String token = tokenizer.nextToken().toLowerCase(); // Normalize to lowercase
+            word.set(token);
+            context.write(word, one);
+
+            // Increment total words processed counter
             context.getCounter("CustomCounters", "Total Words Processed").increment(1);
         }
 
